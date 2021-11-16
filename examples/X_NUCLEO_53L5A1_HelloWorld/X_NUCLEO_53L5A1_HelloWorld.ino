@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file    X_NUCLEO_53L5A1_HelloWorld.ino
- * @author  SRA
+ * @author  STMicroelectronics
  * @version V1.0.0
  * @date    11 November 2021
  * @brief   Arduino test application for the X-NUCLEO-53L5A1 based on VL53L5CX
@@ -61,7 +61,7 @@
 #define PWREN_PIN A3
 
 // Components.
-VL53L5CX sensor_vl53l5cx_sat(&DEV_I2C, LPN_PIN, I2C_RST_PIN);
+VL53L5CX sensor_vl53l5cx_top(&DEV_I2C, LPN_PIN, I2C_RST_PIN);
 
 void blink_led_loop(void);
 
@@ -91,16 +91,16 @@ void setup()
 
   // Initialize serial for output.
   SerialPort.begin(115200);
-  SerialPort.println("Starting...");
+  SerialPort.println("Initialize... Please wait, it may take few seconds...");
 
   // Initialize I2C bus.
   DEV_I2C.begin();
 
   // Configure VL53L5CX satellite component.
-  sensor_vl53l5cx_sat.begin();
+  sensor_vl53l5cx_top.begin();
 
   // Start Measurements
-  sensor_vl53l5cx_sat.vl53l5cx_start_ranging();
+  sensor_vl53l5cx_top.vl53l5cx_start_ranging();
 }
 
 void loop()
@@ -114,20 +114,20 @@ void loop()
   if (loop_count < 10) {
 
     do {
-      status = sensor_vl53l5cx_sat.vl53l5cx_check_data_ready(&NewDataReady);
+      status = sensor_vl53l5cx_top.vl53l5cx_check_data_ready(&NewDataReady);
     } while (!NewDataReady);
 
     //Led on
     digitalWrite(LedPin, HIGH);
 
     if ((!status) && (NewDataReady != 0)) {
-      status = sensor_vl53l5cx_sat.vl53l5cx_get_ranging_data(&Results);
+      status = sensor_vl53l5cx_top.vl53l5cx_get_ranging_data(&Results);
 
       /* As the sensor is set in 4x4 mode by default, we have a total
        * of 16 zones to print.
        */
 
-      snprintf(report, sizeof(report), "Print data no : %3u\r\n", sensor_vl53l5cx_sat.get_stream_count());
+      snprintf(report, sizeof(report), "Print data no : %3u\r\n", sensor_vl53l5cx_top.get_stream_count());
       SerialPort.print(report);
       for (int i = 0; i < 16; i++) {
         snprintf(report, sizeof(report), "Zone : %3d, Status : %3u, Distance : %4d mm\r\n",
@@ -143,7 +143,7 @@ void loop()
     digitalWrite(LedPin, LOW);
   } else if (loop_count == 10) {
     /* Stop measurements */
-    status = sensor_vl53l5cx_sat.vl53l5cx_stop_ranging();
+    status = sensor_vl53l5cx_top.vl53l5cx_stop_ranging();
     if (status) {
       snprintf(report, sizeof(report), "vl53l5cx_stop_ranging failed, status %u\r\n", status);
       SerialPort.print(report);

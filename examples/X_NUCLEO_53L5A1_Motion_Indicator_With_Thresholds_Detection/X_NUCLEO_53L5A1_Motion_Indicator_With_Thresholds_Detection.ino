@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file    X_NUCLEO_53L5A1_Motion_Indicator_With_Thresholds_Detection.ino
- * @author  SRA
+ * @author  STMicroelectronics
  * @version V1.0.0
  * @date    11 November 2021
  * @brief   Arduino test application for the X-NUCLEO-53L5A1 based on VL53L5CX
@@ -62,7 +62,7 @@
 #define INT_PIN A2
 
 // Components.
-VL53L5CX sensor_vl53l5cx_sat(&DEV_I2C, LPN_PIN, I2C_RST_PIN);
+VL53L5CX sensor_vl53l5cx_top(&DEV_I2C, LPN_PIN, I2C_RST_PIN);
 
 VL53L5CX_Motion_Configuration motion_config; /* Motion configuration*/
 
@@ -110,20 +110,20 @@ void setup()
 
   // Initialize serial for output.
   SerialPort.begin(115200);
-  SerialPort.println("Starting...");
+  SerialPort.println("Initialize... Please wait, it may take few seconds...");
 
   // Initialize I2C bus.
   DEV_I2C.begin();
 
   // Configure VL53LX satellite component.
-  sensor_vl53l5cx_sat.begin();
+  sensor_vl53l5cx_top.begin();
 
   /*********************************/
   /*   Program motion indicator    */
   /*********************************/
 
   /* Create motion indicator with resolution 8x8 */
-  status = sensor_vl53l5cx_sat.vl53l5cx_motion_indicator_init(&motion_config, VL53L5CX_RESOLUTION_8X8);
+  status = sensor_vl53l5cx_top.vl53l5cx_motion_indicator_init(&motion_config, VL53L5CX_RESOLUTION_8X8);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_motion_indicator_init failed with status : %u\r\n", status);
     SerialPort.print(report);
@@ -133,7 +133,7 @@ void setup()
   /* (Optional) Change the min and max distance used to detect motions. The
    * difference between min and max must never be >1500mm, and minimum never be <400mm,
    * otherwise the function below returns error 127 */
-  status = sensor_vl53l5cx_sat.vl53l5cx_motion_indicator_set_distance_motion(&motion_config, 1000, 2000);
+  status = sensor_vl53l5cx_top.vl53l5cx_motion_indicator_set_distance_motion(&motion_config, 1000, 2000);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_motion_indicator_set_distance_motion failed with status : %u\r\n", status);
     SerialPort.print(report);
@@ -141,32 +141,32 @@ void setup()
   }
 
   /* If user want to change the resolution, he also needs to update the motion indicator resolution */
-  //status = sensor_vl53l5cx_sat.vl53l5cx_set_resolution(VL53L5CX_RESOLUTION_4X4);
-  //status = sensor_vl53l5cx_sat.vl53l5cx_motion_indicator_set_resolution(&motion_config, VL53L5CX_RESOLUTION_4X4);
+  //status = sensor_vl53l5cx_top.vl53l5cx_set_resolution(VL53L5CX_RESOLUTION_4X4);
+  //status = sensor_vl53l5cx_top.vl53l5cx_motion_indicator_set_resolution(&motion_config, VL53L5CX_RESOLUTION_4X4);
 
   /* Set the device in AUTONOMOUS and set a small integration time to reduce power consumption */
-  status = sensor_vl53l5cx_sat.vl53l5cx_set_resolution(VL53L5CX_RESOLUTION_8X8);
+  status = sensor_vl53l5cx_top.vl53l5cx_set_resolution(VL53L5CX_RESOLUTION_8X8);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_set_resolution failed with status : %u\r\n", status);
     SerialPort.print(report);
     blink_led_loop();
   }
 
-  status = sensor_vl53l5cx_sat.vl53l5cx_set_ranging_mode(VL53L5CX_RANGING_MODE_AUTONOMOUS);
+  status = sensor_vl53l5cx_top.vl53l5cx_set_ranging_mode(VL53L5CX_RANGING_MODE_AUTONOMOUS);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_set_ranging_mode failed with status : %u\r\n", status);
     SerialPort.print(report);
     blink_led_loop();
   }
 
-  status = sensor_vl53l5cx_sat.vl53l5cx_set_ranging_frequency_hz(2);
+  status = sensor_vl53l5cx_top.vl53l5cx_set_ranging_frequency_hz(2);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_set_ranging_frequency_hz failed with status : %u\r\n", status);
     SerialPort.print(report);
     blink_led_loop();
   }
 
-  status = sensor_vl53l5cx_sat.vl53l5cx_set_integration_time_ms(10);
+  status = sensor_vl53l5cx_top.vl53l5cx_set_integration_time_ms(10);
   if (status) {
     snprintf(report, sizeof(report), "vl53l5cx_set_integration_time_ms failed with status : %u\r\n", status);
     SerialPort.print(report);
@@ -201,13 +201,13 @@ void setup()
   thresholds[63].zone_num = VL53L5CX_LAST_THRESHOLD | thresholds[63].zone_num;
 
   /* Send array of thresholds to the sensor */
-  sensor_vl53l5cx_sat.vl53l5cx_set_detection_thresholds(thresholds);
+  sensor_vl53l5cx_top.vl53l5cx_set_detection_thresholds(thresholds);
 
   /* Enable detection thresholds */
-  sensor_vl53l5cx_sat.vl53l5cx_set_detection_thresholds_enable(1);
+  sensor_vl53l5cx_top.vl53l5cx_set_detection_thresholds_enable(1);
 
   // Start Measurements
-  sensor_vl53l5cx_sat.vl53l5cx_start_ranging();
+  sensor_vl53l5cx_top.vl53l5cx_start_ranging();
 
   SerialPort.println("Waiting for a movement into the FOV between 1m and 2m...");
 }
@@ -226,7 +226,7 @@ void loop()
       //Led on
       digitalWrite(LedPin, HIGH);
 
-      status = sensor_vl53l5cx_sat.vl53l5cx_get_ranging_data(&Results);
+      status = sensor_vl53l5cx_top.vl53l5cx_get_ranging_data(&Results);
 
       /* As the sensor is set in 8x8 mode by default, we have a total
        * of 64 zones to print.
@@ -244,7 +244,7 @@ void loop()
     }
   } else if (loop_count == 10) {
     /* Stop measurements */
-    status = sensor_vl53l5cx_sat.vl53l5cx_stop_ranging();
+    status = sensor_vl53l5cx_top.vl53l5cx_stop_ranging();
     if (status) {
       snprintf(report, sizeof(report), "vl53l5cx_stop_ranging failed, status %u\r\n", status);
       SerialPort.print(report);
