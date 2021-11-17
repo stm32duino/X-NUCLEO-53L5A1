@@ -14,10 +14,10 @@ There are 11 examples with the X-NUCLEO-53L5A1 library:
 * X_NUCLEO_53L5A1_Get_Set_Params: This example code is to show how to get/set some parameters of the 
   VL53L5CX sensor.
 
-* X_NUCLEO_53L5A1_HelloWorld: This example code is to show how to get multi-object detection and proximity
+* X_NUCLEO_53L5A1_HelloWorld: This example code is to show how to get multizone detection and proximity
   values of the VL53L5CX satellite sensor in polling mode.
 
-* X_NUCLEO_53L5A1_HelloWorld_Interrupt: This example code is to show how to get multi-object detection and proximity
+* X_NUCLEO_53L5A1_HelloWorld_Interrupt: This example code is to show how to get multizone detection and proximity
   values of the VL53L5CX satellite sensor in interrupt mode.
 
 * X_NUCLEO_53L5A1_I2C_And_RAM_Optimization: This example code is to show how to optimize the code in terms of 
