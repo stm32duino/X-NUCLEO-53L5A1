@@ -109,8 +109,10 @@ void setup()
   // Initialize I2C bus.
   DEV_I2C.begin();
 
-  // Configure VL53LX satellite component.
+  // Configure VL53L5CX component.
   sensor_vl53l5cx_top.begin();
+
+  sensor_vl53l5cx_top.init_sensor();
 
   // Start Measurements
   sensor_vl53l5cx_top.vl53l5cx_start_ranging();
