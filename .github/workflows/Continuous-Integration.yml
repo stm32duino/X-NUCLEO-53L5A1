@@ -49,7 +49,7 @@ jobs:
 
     - name: Compilation
       id: Compile
-      uses: stm32duino/actions/compile-examples@master
+      uses: stm32duino/actions/compile-examples@main
       with:
         board-pattern: "NUCLEO_L476RG"
         libraries: "STM32duino VL53L5CX"
